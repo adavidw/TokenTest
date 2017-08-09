@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Token Request</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" >
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style type="text/css">
+body {
+  /*background: linear-gradient(90deg, white, gray);*/
+  background-color: #eee;
+}
+
+body, h1, p {
+  font-family: "Helvetica Neue", "Segoe UI", Segoe, Helvetica, Arial, "Lucida Grande", sans-serif;
+  font-weight: normal;
+  margin: 0;
+  padding: 0;
+  text-align: center;
+}
+
+table {
+    margin-left:auto; 
+    margin-right:auto;
+}
+
+td {
+    padding: 8px;
+}
+
+button {
+    height: 50px;
+    width: 100px;
+    font-size: 18px;
+}
+
+h1 {
+  font-size: 36px;
+  font-weight: 300;
+  margin: 0 0 20px 0;
+}
+
+p {
+  margin: 0 0 10px;
+}
+</style>
+
+<script type="text/javascript" src="https://js.authorize.net/v1/Accept.js" charset="utf-8"></script>
+    
+</head>
+
+<body>
+
+<h1>Token Request</h1>
+    
+    
+<form id="paymentForm">
+    <table>
+        <tr>
+            <td>
+                API Login ID<br>
+                <input type="text" class="form-control" id="API_LOGIN_ID" placeholder="63xxxxxx" value="" />
+            </td><td></td>
+            <td>
+                Card Number<br>
+                <input type="tel" class="form-control" id="CARDNUMBER_ID" placeholder="5424000000000015" value="5424000000000015" autocomplete="off" />
+            </td>
+        </tr>
+        <tr>
+            <td>
+                Public Client Key<br>
+                <input type="text" class="form-control" id="PUBLIC_CLIENT_KEY" placeholder="95f757U4xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+                    value="" />
+            </td><td></td>
+            <td>
+                Expiration Date (Month)<br>
+                <input type="text" class="form-control" id="EXPIRY_MONTH_ID" placeholder="12" value="12" />
+            </td>
+        </tr>
+        <tr>
+            <td>
+            </td><td></td>
+            <td>
+                Expiration Date (Year)<br>
+                <input type="text" class="form-control" id="EXPIRY_YEAR_ID" placeholder="2020" value="2020" />
+            </td>
+        </tr>
+        <tr>
+            <td>
+            </td><td></td>
+            <td>
+                Card Security Code<br>
+                <input type="text" class="form-control" id="CARD_CODE" placeholder="900" value="900" />
+            </td>
+        </tr>
+        <tr>
+            <td>
+            </td><td></td>
+            <td>
+                Amount<br>
+                <input type="text" class="form-control" id="AMOUNT" placeholder="10.00" value="10.00" />
+            </td>
+        </tr>
+        <tr>
+            <td>
+            </td><td></td>
+            <td>
+                ZIP<br>
+                <input type="text" class="form-control" id="ZIP" placeholder="46282" value="" />
+            </td>
+        </tr>
+        <tr>
+            <td>
+                Wait/retry interval (in ms)<br>
+                <input type="text" class="form-control" id="INTERVAL" placeholder="500" value="500" />
+            </td><td></td>
+            <td>
+                Full Name<br>
+                <input type="text" class="form-control" id="NAME" placeholder="fullName" value="" />
+            </td>
+        </tr>
+    </table>
+    <br>
+    <button type="button" class="Button" id="submitButton" onclick="sendPaymentDataToAnet()">Get a Token</button>
+</form>
+
+<script type="text/javascript">
+    
+    
+// Upon clicking the "Pay" button, extract the card number and expiration date, and pass those to Accept.js for submission to Authorize.Net
+function sendPaymentDataToAnet() {
+    var secureData = {}; authData = {}; cardData = {};
+
+    cardData.cardNumber = document.getElementById("CARDNUMBER_ID").value;
+    cardData.month = document.getElementById("EXPIRY_MONTH_ID").value;
+    cardData.year = document.getElementById("EXPIRY_YEAR_ID").value;
+    cardData.cardCode = document.getElementById("CARD_CODE").value;
+    cardData.zip = document.getElementById("ZIP").value;
+    cardData.fullName = document.getElementById("NAME").value;
+    secureData.cardData = cardData;
+   
+
+    // The Authorize.Net Client Key is used in place of the traditional Transaction Key. The Transaction Key is a shared secret and must never be exposed. The Client Key is a public Key suitable for use where someone outside the merchant might see it.
+    authData.apiLoginID = document.getElementById("API_LOGIN_ID").value;
+    authData.clientKey = document.getElementById("PUBLIC_CLIENT_KEY").value;
+    // or, write these values directly...
+    // authData.apiLoginID = "63xxxxxx";
+    // authData.clientKey = "95f757U4xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";
+    secureData.authData = authData;
+
+    Accept.dispatchData(secureData, 
+        function responseHandler(response) {
+            // When the response is returned from Accept.js, validate that the data looks correct, and record the OpaqueData to the console and the output box.
+        if (response.messages.resultCode === "Error") {
+            for (var i = 0; i < response.messages.message.length; i++) {
+                console.log(response.messages.message[i].code + ": " + response.messages.message[i].text);
+            }
+            alert("acceptJS library error!")
+        } else {
+            console.log(response.opaqueData.dataDescriptor);
+            console.log(response.opaqueData.dataValue);
+            document.getElementById("outputBox").value="dataDescriptor: ";
+            document.getElementById("outputBox").value = document.getElementById("outputBox").value+response.opaqueData.dataDescriptor;
+            document.getElementById("outputBox").value = document.getElementById("outputBox").value+"\ndataValue: ";
+            document.getElementById("outputBox").value = document.getElementById("outputBox").value+response.opaqueData.dataValue;
+            setTimeout(sendPaymentDataToAnet, document.getElementById("INTERVAL").value);
+        }
+    }
+    
+    );
+
+
+
+}
+
+
+</script>
+
+<br />
+<br />
+
+
+<textarea id="outputBox" rows=10 cols=120 placeholder="output goes here"></textarea>
+<br />
+<button type="button" class="Button" id="reloadButton" onclick="window.location.reload()">Reload</button>
+
+</body>
+</html>
