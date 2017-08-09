@@ -149,7 +149,7 @@ function sendPaymentDataToAnet() {
 
     Accept.dispatchData(secureData, responseHandler);
 
-    // When the response is returned from Accept.js, validate that the data looks correct, and record the OpaqueData to the console, and call the transaction processing function.
+    // When the response is returned from Accept.js, validate that the data looks correct, and record the OpaqueData to the console and the output box.
     function responseHandler(response) {
         if (response.messages.resultCode === "Error") {
             for (var i = 0; i < response.messages.message.length; i++) {
