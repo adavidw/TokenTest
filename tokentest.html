@@ -142,8 +142,9 @@ function sendPaymentDataToAnet() {
     // The Authorize.Net Client Key is used in place of the traditional Transaction Key. The Transaction Key is a shared secret and must never be exposed. The Client Key is a public Key suitable for use where someone outside the merchant might see it.
     authData.apiLoginID = document.getElementById("API_LOGIN_ID").value;
     authData.clientKey = document.getElementById("PUBLIC_CLIENT_KEY").value;
-    // authData.clientKey = "5TwspsxMp2L4T8ZVkqy9M8b93zrz8nBAc3A2K67RX73L7DcHtjyCbM6czVGjKSfh";
-    // authData.apiLoginID = "82kaC8Kf3";
+    // or, write these values directly...
+    // authData.apiLoginID = "63xxxxxx";
+    // authData.clientKey = "95f757U4xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";
     secureData.authData = authData;
 
     Accept.dispatchData(secureData, responseHandler);
